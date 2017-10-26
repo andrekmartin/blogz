@@ -4,19 +4,19 @@
 
 <h1 style = "text-align:center">Post new Blog Entry</h1>
 
-<form action='/newpost' method='POST'>
+<form action='/blog' method='POST'>
     <div>
         <label for="title">Blog title:</label>
     </div>
     <div>
-        <input type="text" name="title" value="{{title}}" />        
+        <input type="text" name="title" />        
     </div>
     <div>
         <br>
         <label for="body">New blog:</label>
     </div>
     <div>
-        <textarea name="body" rows="10" cols="30" value="{{body}}"></textarea>
+        <textarea name="body" rows="10" cols="30" ></textarea>
     </div>
     <div>
         <input type="Submit" value="Post entry" />

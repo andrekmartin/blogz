@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<h1 style = "text-align:center">Build a Blog</h1>
-
-{% for blog in blogs %}
-<a href="/blog?id={{blog.id}}"><h2>{{blog.title}}</h2></a>
-
-<p>{{ blog.body }}</p>
-
-<hr />       
-
-{% endfor %}
-
-
+<h1 style = "text-align:center">Blogz Posts</h1>
+    {% for post in posts %}
+        <h2><a href='/blog?id={{post.id}}'>{{post.title}}</a></h2>
+        <p>{{post.body}}</p>
+        {% for user in users %}
+            {% if post.owner.id == user.id %}
+                <p><em>Written by <a href='/blog?user={{user.username}}'>{{user.username}}</em><p>
+            {% endif %}
+        {% endfor %}
+        <hr />
+    {% endfor %}
 {% endblock %}

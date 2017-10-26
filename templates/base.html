@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Build-a-Blog</title>
+        <!--<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/normalize.css') }}">-->
+        <title>{{title}}</title>
         <style>
-            .error{
+            .error {
                 color: red;
             }
         </style>
     </head>
 <body>
     
-    <span>
-        <a href='/blog'>View posts</a>
-    </span>
-    <span>
-        <a href='/newpost'>Add new post</a>
-    </span>
+    <div>
+        
+        <a href='/'>Home</a>&nbsp; &nbsp;
+        <a href='/blog'>All Posts</a>&nbsp; &nbsp;
+        <a href='/newpost'>Add Blog Entry</a>&nbsp; &nbsp;
+        <a href='/login'>Login</a>&nbsp; &nbsp;
+        <a href='/logout'>Logout</a>
+   
+    </div>
 
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% for category, message in messages %}
