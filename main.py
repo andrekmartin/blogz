@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
-
+from hashutils import make_pw_hash, check_pw_hash
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -13,24 +14,28 @@ class Blog(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(120))
     body = db.Column(db.Text())
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    def __init__(self, title, body, owner_id):
+    pub_date = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id')) 
+    
+    def __init__(self, title, body, user_id, pub_date=None):
         self.title = title
         self.body = body
-        self.owner = owner_id
-        
+        self.user = user_id
+        if pub_date is None:
+            pub_date = datetime.utcnow()
+        self.pub_date = pub_date
+
 
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(60))
-    password = db.Column(db.String(60))
-    blogs = db.relationship('Blog', backref='owner')
+    username = db.Column(db.String(120))
+    pw_hash = db.Column(db.String(120))
+    blogs = db.relationship('Blog', backref='user')
 
     def __init__(self, username, password):
         self.username = username
-        self.password = password
+        self.pw_hash = make_pw_hash(password)
 
 
 @app.before_request
@@ -46,7 +51,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if user and check_pw_hash(password, user.pw_hash):
             session['username'] = username
             flash("Logged In")
             return redirect('/newpost')
@@ -115,9 +120,9 @@ def blog():
     if request.args.get('id'):
         blog_id = request.args.get('id')
         post = Blog.query.get(blog_id)
-        owner_id = request.args.get('id')
-        owner = Blog.query.get(owner_id)
-        return render_template('post.html', post=post, owner=owner)
+        user_id = request.args.get('id')
+        user = Blog.query.get(user_id)
+        return render_template('post.html', post=post, user=user)
 
     if request.args.get('user'):
         username = request.args.get('user')
@@ -133,8 +138,8 @@ def blog():
             flash('Please fill in both fields', 'error')
             return render_template('new_post.html')
         else:
-            owner = User.query.filter_by(username=session['username']).first()
-            new_post = Blog(title, body, owner)
+            user = User.query.filter_by(username=session['username']).first()
+            new_post = Blog(title, body, user, pub_date=None)
             db.session.add(new_post)
             db.session.commit()
             return redirect('/blog?id={0}'.format(new_post.id))

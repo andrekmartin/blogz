@@ -6,7 +6,7 @@
         <h2><a href='/blog?id={{post.id}}'>{{post.title}}</a></h2>
         <p>{{post.body}}</p>
         {% for user in users %}
-            {% if post.owner.id == user.id %}
+            {% if post.user.id == user.id %}
                 <p><em>Written by <a href='/blog?user={{user.username}}'>{{user.username}}</em><p>
             {% endif %}
         {% endfor %}
